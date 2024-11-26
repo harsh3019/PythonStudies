@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FastAPI Form</title>
+</head>
+<body>
+    <h1>Submit Your Details</h1>
+    <form action="/submit" method="post" enctype="multipart/form-data">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <br><br>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <br><br>
+        <label for="FileUpload">FileUpload:</label>
+        <input type="file" name="file">
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
