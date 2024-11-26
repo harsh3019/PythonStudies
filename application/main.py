@@ -68,20 +68,20 @@
 
 
 #Form Request In Python
-from fastapi import FastAPI, Form, Request,UploadFile,File
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+# from fastapi import FastAPI, Form, Request,UploadFile,File
+# from fastapi.templating import Jinja2Templates
+# from fastapi.responses import HTMLResponse
 
-app = FastAPI()
+# app = FastAPI()
 
-# Define the template directory correctly
-templates = Jinja2Templates(directory="application/templates")
-print(templates)
+# # Define the template directory correctly
+# templates = Jinja2Templates(directory="application/templates")
+# print(templates)
 
-# Route to render the form
-@app.get('/', response_class=HTMLResponse)
-async def read_form(request: Request):
-    return templates.TemplateResponse("form.html", {"request": request})
+# # Route to render the form
+# @app.get('/', response_class=HTMLResponse)
+# async def read_form(request: Request):
+#     return templates.TemplateResponse("form.html", {"request": request})
 
 # # Route to handle form submission
 # @app.post('/submit')
@@ -90,13 +90,55 @@ async def read_form(request: Request):
 #         "content_type": file.content_type}
 
 #Pass all data in one dictonary
-@app.post('/submit')
-async def submit_form(request:Request,file: UploadFile = File(...)):
-    form_data = await request.form() # Access all form data as a dictionary
-    return {
-        "form_data" : form_data,
-        "filename" : file.filename,
-        "content_type": file.content_type
+# @app.post('/submit')
+# async def submit_form(request:Request,file: UploadFile = File(...)):
+#     form_data = await request.form() # Access all form data as a dictionary
+#     return {
+#         "form_data" : form_data,
+#         "filename" : file.filename,
+#         "content_type": file.content_type
     
 
-    }
+#     }
+
+
+#Dependencies Injection
+
+from fastapi import FastAPI,Depends,Header,HTTPException
+import random
+
+app = FastAPI()
+
+def get_query(q : str = "default"):
+    return q
+
+@app.get('/testing')
+def check_dependency(query : str = Depends(get_query)):
+    return query
+
+def get_answer(item : str):
+    return item
+
+@app.get('/test/check')
+def check_test_dep(querr : str = Depends(get_answer),query : str = Depends(get_query)):
+    return [querr,query]
+
+
+def get_token(q : str = Header(...)):
+    return q
+
+@app.get('/test/header')
+def get_header_info(test:str = Depends(get_token)):
+    return test
+
+def check_token(token : str = random.randint(1, 100)):
+  
+    print(token)
+    if token == '':
+        raise HTTPException(status_code=404,detail="Token not Found")
+    else:
+        return token
+
+@app.get('/generate/token')
+async def generate_token_data(token_sess:str = Depends(check_token)):
+    return token_sess
